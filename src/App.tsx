@@ -1,122 +1,80 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+// src/App.tsx
+// Punto de entrada de la aplicación React.
+// Demuestra el uso del componente DataTable genérico y las utilidades de fechas.
 
-function App() {
-  const [count, setCount] = useState(0)
+import { DataTable } from './components/DataTable';
+import { calcularDiferenciaEnDias } from './utils/dateUtils';
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+// ── Tipos de datos de ejemplo ───────────────────────────────
+interface Estudiante {
+  id: number;
+  nombreCompleto: string;
+  email: string;
+  carrera: string;
 }
 
-export default App
+interface Asignatura {
+  id: number;
+  nombre: string;
+  creditos: number;
+  departamento: string;
+}
+
+// ── Datos de ejemplo ────────────────────────────────────────
+const estudiantes: Estudiante[] = [
+  { id: 1, nombreCompleto: 'Ana García', email: 'ana@universidad.es', carrera: 'Informática' },
+  { id: 2, nombreCompleto: 'Luis Martínez', email: 'luis@universidad.es', carrera: 'Matemáticas' },
+  { id: 3, nombreCompleto: 'Sara López', email: 'sara@universidad.es', carrera: 'Física' },
+];
+
+const asignaturas: Asignatura[] = [
+  { id: 1, nombre: 'Programación Web', creditos: 6, departamento: 'Informática' },
+  { id: 2, nombre: 'Bases de Datos', creditos: 6, departamento: 'Informática' },
+  { id: 3, nombre: 'Cálculo I', creditos: 9, departamento: 'Matemáticas' },
+];
+
+// ── Columnas para cada tabla ────────────────────────────────
+const columnasEstudiantes = [
+  { key: 'nombreCompleto' as const, titulo: 'Nombre' },
+  { key: 'email' as const, titulo: 'Email' },
+  { key: 'carrera' as const, titulo: 'Carrera' },
+];
+
+const columnasAsignaturas = [
+  { key: 'nombre' as const, titulo: 'Asignatura' },
+  { key: 'creditos' as const, titulo: 'Créditos' },
+  { key: 'departamento' as const, titulo: 'Departamento' },
+];
+
+// ── Componente principal ────────────────────────────────────
+function App() {
+  const diasDesdeInicioCurso = calcularDiferenciaEnDias(
+    new Date('2025-09-01'),
+    new Date()
+  );
+
+  return (
+    <div style={{ maxWidth: '900px', margin: '2rem auto', padding: '0 1rem' }}>
+      <h1 style={{ fontFamily: 'sans-serif' }}>
+        🎓 Sistema Universitario
+      </h1>
+      <p style={{ fontFamily: 'sans-serif', color: '#666' }}>
+        Han pasado <strong>{diasDesdeInicioCurso} días</strong> desde el inicio del curso.
+      </p>
+
+      <DataTable<Estudiante>
+        titulo="📋 Estudiantes"
+        datos={estudiantes}
+        columnas={columnasEstudiantes}
+      />
+
+      <DataTable<Asignatura>
+        titulo="📚 Asignaturas"
+        datos={asignaturas}
+        columnas={columnasAsignaturas}
+      />
+    </div>
+  );
+}
+
+export default App;
